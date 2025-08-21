@@ -5,11 +5,10 @@ import {
   ElementRef,
   forwardRef,
   HostListener,
-  Inject,
+  inject,
   Input,
   KeyValueDiffer,
   KeyValueDiffers,
-  Optional,
 } from '@angular/core';
 
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -33,6 +32,9 @@ import {
 export class NgxCurrencyDirective
   implements AfterViewInit, ControlValueAccessor, DoCheck
 {
+  private readonly _elementRef =
+    inject<ElementRef<HTMLInputElement>>(ElementRef);
+
   @Input()
   set currencyMask(value: Partial<NgxCurrencyConfig> | string) {
     if (typeof value === 'string') return;
@@ -57,13 +59,13 @@ export class NgxCurrencyDirective
   private _options: Partial<NgxCurrencyConfig> = {};
   private readonly _optionsTemplate: NgxCurrencyConfig;
 
-  constructor(
-    @Optional()
-    @Inject(NGX_CURRENCY_CONFIG)
-    globalOptions: Partial<NgxCurrencyConfig>,
-    keyValueDiffers: KeyValueDiffers,
-    private readonly _elementRef: ElementRef<HTMLInputElement>,
-  ) {
+  constructor() {
+    const globalOptions = inject<Partial<NgxCurrencyConfig>>(
+      NGX_CURRENCY_CONFIG,
+      { optional: true },
+    );
+    const keyValueDiffers = inject(KeyValueDiffers);
+
     this._optionsTemplate = {
       align: 'right',
       allowNegative: true,
